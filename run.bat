@@ -7,7 +7,7 @@ REM Créer le dossier build
 mkdir build
 
 REM Compiler les fichiers Java
-javac --release 21 -cp "lib/*" -d build src\main\java\*.java
+javac --release 21 -cp "lib/*" -d build mg/itu/rivaldo/annotation/*.java mg/itu/rivaldo/controller/*.java
 
 REM Vérifier si la compilation a échoué
 if %errorlevel% neq 0 (
