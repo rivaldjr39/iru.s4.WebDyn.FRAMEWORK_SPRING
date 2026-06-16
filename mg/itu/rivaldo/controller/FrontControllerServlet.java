@@ -1,49 +1,58 @@
+// FrontControllerServlet.java - version corrigée
 package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import mg.itu.rivaldo.annotation.Url;
 import java.util.List;
-import mg.itu.rivaldo.controller.Util;
+import mg.itu.rivaldo.annotation.Url;
 
 public class FrontControllerServlet extends HttpServlet {
-    private Util util = new Util();
-    List<String> controllerClassNames;
 
+    private Util util = new Util();
+    private List<String> controllerClassNames;
+
+    @Override
     public void init() throws ServletException {
         try {
-            controllerClassNames = util.getListClassNamesWithAnnotation("mg.itu.rivaldo.annotation", Url.class);
+            controllerClassNames = util.getListClassNamesWithAnnotation(
+                "mg.itu.rivaldo.annotation",  // ✅ package du Controller dans la JAR
+                Url.class
+            );
+            System.out.println("Classes trouvées : " + controllerClassNames);
         } catch (Exception e) {
-            throw new ServletException("Erreur lors de la récupération des classes avec l'annotation @Url", e);
+            throw new ServletException("Erreur initialisation", e);
         }
     }
 
-    protected void processRequest(HttpServletRequest request,HttpServletResponse response)throws ServletException, IOException {response.setContentType("text/plain");
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        String contextPath = request.getContextPath();
+        response.setContentType("text/plain");
         String uri = request.getRequestURI();
-        String path = uri.substring(contextPath.length());
-        PrintWriter out = response.getWriter();
-        out.println("URL recue : " + uri);
-        out.println("Chemin : " + path);
-        for (String className : controllerClassNames) {
-           out.println("Classe trouvée : " + className);
-        }
-    }
+        String path = uri.substring(request.getContextPath().length());
 
-    
-    protected void doGet(HttpServletRequest request,HttpServletResponse response)throws ServletException, IOException {
-                processRequest(request, response);
+        PrintWriter out = response.getWriter();
+        out.println("URL reçue : " + uri);
+        out.println("Chemin    : " + path);
+        out.println("---");
+        for (String className : controllerClassNames) {
+            out.println("Classe trouvée : " + className);
+        }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,HttpServletResponse response)throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        processRequest(req, res);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        processRequest(req, res);
     }
 }
