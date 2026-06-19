@@ -32,46 +32,7 @@ public class FrontControllerServlet extends HttpServlet {
     }
 
 
-    private String findMethodByUrl(String path) throws Exception {
-
-        for (String className : controllerClassNames) {
-
-            Class<?> clazz = Class.forName(className);
-
-            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
-
-                if (method.isAnnotationPresent(UrlMethod.class)) {
-
-                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
-
-                    String annotationUrl = urlMethod.value();
-
-                    // comparaison du path avec l'annotation
-                    if (annotationUrl.equals("/" + path)) {
-
-                        return clazz.getSimpleName() + " -> " + method.getName();
-                    }
-                }
-            }
-        }
-
-        return "Aucune méthode trouvée, les methodes disponibles sont : " + getAllAnnotatedMethods();
-    }
-
-    private String getAllAnnotatedMethods() throws Exception {
-        List<String> methodsList = new ArrayList<>();
-
-        for (String className : controllerClassNames) {
-            Class<?> clazz = Class.forName(className);
-            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(UrlMethod.class)) {
-                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
-                    methodsList.add(clazz.getSimpleName() + " -> " + method.getName() + " (URL: " + urlMethod.value() + ")");
-                }
-            }
-        }
-        return String.join(", ", methodsList);
-    }
+    
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -83,7 +44,7 @@ public class FrontControllerServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             out.println("URL    : " + path);
-            String result = findMethodByUrl(path);
+            String result = util.findMethodByUrl(controllerClassNames, path);
             out.println("Resultat  class et methode annotée   : " + result);
         } catch (Exception e) {
             out.println("Erreur lors de la recherche de la méthode : " + e.getMessage());

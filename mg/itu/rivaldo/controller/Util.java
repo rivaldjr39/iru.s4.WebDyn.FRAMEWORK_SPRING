@@ -83,5 +83,46 @@ public class Util {
             e.printStackTrace();
         }
     }
+
+    public String findMethodByUrl(List<String> controllerClassNames, String path) throws Exception {
+
+        for (String className : controllerClassNames) {
+
+            Class<?> clazz = Class.forName(className);
+
+            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
+
+                if (method.isAnnotationPresent(UrlMethod.class)) {
+
+                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
+
+                    String annotationUrl = urlMethod.value();
+
+                    // comparaison du path avec l'annotation
+                    if (annotationUrl.equals("/" + path)) {
+
+                        return clazz.getSimpleName() + " -> " + method.getName();
+                    }
+                }
+            }
+        }
+
+        return "Aucune méthode trouvée, les methodes disponibles sont : " + getAllAnnotatedMethods(controllerClassNames);
+    }
+
+    private String getAllAnnotatedMethods(List<String> controllerClassNames) throws Exception {
+        List<String> methodsList = new ArrayList();
+
+        for (String className : controllerClassNames) {
+            Class<?> clazz = Class.forName(className);
+            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(UrlMethod.class)) {
+                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
+                    methodsList.add(clazz.getSimpleName() + " -> " + method.getName() + " (URL: " + urlMethod.value() + ")");
+                }
+            }
+        }
+        return String.join(", ", methodsList);
+    }
     
 }
