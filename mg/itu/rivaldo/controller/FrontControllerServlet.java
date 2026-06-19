@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import mg.itu.rivaldo.annotation.Url;
+import java.util.ArrayList;
 
 public class FrontControllerServlet extends HttpServlet {
 
@@ -34,10 +35,9 @@ public class FrontControllerServlet extends HttpServlet {
         response.setContentType("text/plain");
         String uri = request.getRequestURI();
         String path = uri.substring(request.getContextPath().length());
-
+        path = path.substring(1);
         PrintWriter out = response.getWriter();
-        out.println("URL reçue : " + uri);
-        out.println("Chemin    : " + path);
+        out.println("Resultat    : " + path);
         out.println("---");
         for (String className : controllerClassNames) {
             out.println("Classe trouvée : " + className);
