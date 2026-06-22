@@ -81,7 +81,7 @@ public class FrontControllerServlet extends HttpServlet {
             out.println("Erreur lors de la recherche de la méthode : " + e.getMessage());
         }
         
-        out.println("---");
+        out.println("---Sprint1---");
         for (String className : controllerClassNames) {
             out.println("Classe trouvée : " + className);
         }
