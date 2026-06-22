@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.util.List;
 import mg.itu.rivaldo.annotation.Url;
 import mg.itu.rivaldo.annotation.UrlMethod;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.ArrayList;
 
@@ -17,6 +19,7 @@ public class FrontControllerServlet extends HttpServlet {
 
     private Util util = new Util();
     private List<String> controllerClassNames;
+    private Map<String,List<List<String>>> urlToMethodMap = new HashMap<>();
 
     @Override
     public void init() throws ServletException {
@@ -25,6 +28,7 @@ public class FrontControllerServlet extends HttpServlet {
                 "mg.itu.rivaldo.annotation",  
                 Url.class
             );
+            urlToMethodMap = util.buildUrlToMethodMap(controllerClassNames, UrlMethod.class);
             System.out.println("Classes trouvées : " + controllerClassNames);
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
@@ -44,8 +48,35 @@ public class FrontControllerServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             out.println("URL    : " + path);
-            String result = util.findMethodByUrl(controllerClassNames, path);
-            out.println("Resultat  class et methode annotée   : " + result);
+            boolean found = false;
+
+            for (Map.Entry<String, List<List<String>>> entry : urlToMethodMap.entrySet()) {
+
+                String className = entry.getKey();
+                List<List<String>> methodInfoList = entry.getValue();
+                for (List<String> methodInfo : methodInfoList) {
+                    String url = methodInfo.get(0);
+                    String methodName = methodInfo.get(1);
+                    if (url.equals("/" + path)) {
+                        out.println("URL    : " + url+"  Classe : " + className + "-> " + methodName);
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                out.println("Aucune méthode trouvée pour l'URL : " + path);
+                out.println("Les méthodes disponibles sont :");
+                for (Map.Entry<String, List<List<String>>> entry : urlToMethodMap.entrySet()) {
+                    String className = entry.getKey();
+                    List<List<String>> methodInfoList = entry.getValue();
+                    for (List<String> methodInfo : methodInfoList) {
+                        String url = methodInfo.get(0);
+                        String methodName = methodInfo.get(1);
+                        out.println("URL : " + url + "  Classe : " + className + "-> " + methodName);
+                    }
+            }
+            }
+            
         } catch (Exception e) {
             out.println("Erreur lors de la recherche de la méthode : " + e.getMessage());
         }

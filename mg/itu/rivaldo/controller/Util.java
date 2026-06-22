@@ -11,6 +11,9 @@ import java.util.jar.JarFile;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import mg.itu.rivaldo.annotation.UrlMethod;
+import java.util.Map;
+import java.util.HashMap;
+import java.lang.annotation.Annotation;
 
 public class Util {
 
@@ -84,7 +87,30 @@ public class Util {
         }
     }
 
-    public String findMethodByUrl(List<String> controllerClassNames, String path) throws Exception {
+    public<T extends Annotation> Map<String, List<List<String>>> buildUrlToMethodMap(List<String> controllerClassNames , Class<T> annotationMethod) throws Exception {
+        
+        Map<String, List<List<String>>> urlToMethodMap = new HashMap<>();
+        for(String controllerClassName : controllerClassNames) {
+            Class<?> controllerClass = Class.forName(controllerClassName);
+            String className = controllerClass.getSimpleName();
+            List<List<String>> mappings = new ArrayList<>();
+
+            for(Method method : controllerClass.getDeclaredMethods()) {
+                if(method.isAnnotationPresent(annotationMethod)) {
+                    T urlMethod = method.getAnnotation(annotationMethod);
+                    String url = urlMethod.toString().split("\\(")[1].split("\\)")[0].replace("\"", "");
+                    List<String> methodInfo = new ArrayList<>();
+                    methodInfo.add(url);
+                    methodInfo.add(method.getName());
+                    mappings.add(methodInfo);
+                }
+            }
+            urlToMethodMap.put(className, mappings);
+        }
+        return urlToMethodMap;
+    }
+
+    /*public String findMethodByUrl(List<String> controllerClassNames, String path) throws Exception {
 
         for (String className : controllerClassNames) {
 
@@ -121,6 +147,6 @@ public class Util {
             }
         }
         return String.join(", ", methodsList);
-    }
+    }*/
     
 }
