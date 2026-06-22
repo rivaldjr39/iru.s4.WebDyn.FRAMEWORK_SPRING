@@ -8,7 +8,7 @@ public class Controller {
     public void home() {
         System.out.println("Welcome to the Home Page!");
     }
-    @UrlMethod("/about")
+    @UrlMethod("/home")
     public void about() {
         System.out.println("This is the About Page.");
     }

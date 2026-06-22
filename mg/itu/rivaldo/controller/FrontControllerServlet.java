@@ -22,7 +22,7 @@ public class FrontControllerServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
             controllerClassNames = util.getListClassNamesWithAnnotation(
-                "mg.itu.rivaldo.annotation",  // ✅ package du Controller dans la JAR
+                "mg.itu.rivaldo.annotation",  
                 Url.class
             );
             System.out.println("Classes trouvées : " + controllerClassNames);

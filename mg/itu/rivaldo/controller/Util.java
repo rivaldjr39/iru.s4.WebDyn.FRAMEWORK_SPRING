@@ -98,9 +98,7 @@ public class Util {
 
                     String annotationUrl = urlMethod.value();
 
-                    // comparaison du path avec l'annotation
                     if (annotationUrl.equals("/" + path)) {
-
                         return clazz.getSimpleName() + " -> " + method.getName();
                     }
                 }
