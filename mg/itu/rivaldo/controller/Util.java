@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.lang.annotation.Annotation;
 
 public class Util {
-
+//Sprint1 
     public List<String> getListClassNamesWithAnnotation(String packageName,Class annotationClass) {
 
         List<String> result = new ArrayList<>();
@@ -87,6 +87,8 @@ public class Util {
         }
     }
 
+    //Sprint 2
+
     public<T extends Annotation> Map<String, List<List<String>>> buildUrlToMethodMap(List<String> controllerClassNames , Class<T> annotationMethod) throws Exception {
         
         Map<String, List<List<String>>> urlToMethodMap = new HashMap<>();
@@ -110,43 +112,6 @@ public class Util {
         return urlToMethodMap;
     }
 
-    /*public String findMethodByUrl(List<String> controllerClassNames, String path) throws Exception {
-
-        for (String className : controllerClassNames) {
-
-            Class<?> clazz = Class.forName(className);
-
-            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
-
-                if (method.isAnnotationPresent(UrlMethod.class)) {
-
-                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
-
-                    String annotationUrl = urlMethod.value();
-
-                    if (annotationUrl.equals("/" + path)) {
-                        return clazz.getSimpleName() + " -> " + method.getName();
-                    }
-                }
-            }
-        }
-
-        return "Aucune méthode trouvée, les methodes disponibles sont : " + getAllAnnotatedMethods(controllerClassNames);
-    }
-
-    private String getAllAnnotatedMethods(List<String> controllerClassNames) throws Exception {
-        List<String> methodsList = new ArrayList();
-
-        for (String className : controllerClassNames) {
-            Class<?> clazz = Class.forName(className);
-            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(UrlMethod.class)) {
-                    UrlMethod urlMethod = method.getAnnotation(UrlMethod.class);
-                    methodsList.add(clazz.getSimpleName() + " -> " + method.getName() + " (URL: " + urlMethod.value() + ")");
-                }
-            }
-        }
-        return String.join(", ", methodsList);
-    }*/
+    
     
 }

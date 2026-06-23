@@ -51,7 +51,6 @@ public class FrontControllerServlet extends HttpServlet {
             boolean found = false;
 
             for (Map.Entry<String, List<List<String>>> entry : urlToMethodMap.entrySet()) {
-
                 String className = entry.getKey();
                 List<List<String>> methodInfoList = entry.getValue();
                 for (List<String> methodInfo : methodInfoList) {
@@ -74,7 +73,7 @@ public class FrontControllerServlet extends HttpServlet {
                         String methodName = methodInfo.get(1);
                         out.println("URL : " + url + "  Classe : " + className + "-> " + methodName);
                     }
-            }
+                }
             }
             
         } catch (Exception e) {
