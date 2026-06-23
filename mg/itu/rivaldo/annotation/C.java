@@ -2,11 +2,11 @@ package mg.itu.rivaldo.annotation;
 
 @Url("/home")
 public class C {
-    @UrlMethod("/bienvenue")
+    @UrlMethod(value = "/bienvenue", type = "GET")
     public void home() {
     }
 
-    @UrlMethod("/test")
+    @UrlMethod(value = "/test", type = "GET")
     public void test() {
     }
 }

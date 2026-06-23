@@ -4,12 +4,10 @@ import mg.itu.rivaldo.annotation.UrlMethod;
 
 @Url("/home")
 public class Controller {
-    @UrlMethod("/home")
-    public void home() {
-        System.out.println("Welcome to the Home Page!");
-    }
-    @UrlMethod("/about")
-    public void about() {
-        System.out.println("This is the About Page.");
-    }
+    @UrlMethod(value = "/home", type = "GET")
+    public void home() {}
+
+
+    @UrlMethod(value = "/home", type = "POST")
+    public void about() {}
 }
