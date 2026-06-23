@@ -19,17 +19,14 @@ public class FrontControllerServlet extends HttpServlet {
 
     private Util util = new Util();
     private List<String> controllerClassNames;
-    private Map<String,List<List<String>>> urlToMethodMap = new HashMap<>();
+    private Map<String, Mapping> mappingUrls = new HashMap<>();
+   
 
     @Override
     public void init() throws ServletException {
         try {
             controllerClassNames = util.getListClassNamesWithAnnotation(
-                "mg.itu.rivaldo.annotation",  
-                Url.class
-            );
-            urlToMethodMap = util.buildUrlToMethodMap(controllerClassNames, UrlMethod.class);
-            System.out.println("Classes trouvées : " + controllerClassNames);
+                "mg.itu.rivaldo.annotation",Url.class,mappingUrls);
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
@@ -48,38 +45,23 @@ public class FrontControllerServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             out.println("URL    : " + path);
-            boolean found = false;
-
-            for (Map.Entry<String, List<List<String>>> entry : urlToMethodMap.entrySet()) {
-                String className = entry.getKey();
-                List<List<String>> methodInfoList = entry.getValue();
-                for (List<String> methodInfo : methodInfoList) {
-                    String url = methodInfo.get(0);
-                    String methodName = methodInfo.get(1);
-                    if (url.equals("/" + path)) {
-                        out.println("URL    : " + url+"  Classe : " + className + "-> " + methodName);
-                        found = true;
-                    }
-                }
-            }
-            if (!found) {
-                out.println("Aucune méthode trouvée pour l'URL : " + path);
-                out.println("Les méthodes disponibles sont :");
-                for (Map.Entry<String, List<List<String>>> entry : urlToMethodMap.entrySet()) {
-                    String className = entry.getKey();
-                    List<List<String>> methodInfoList = entry.getValue();
-                    for (List<String> methodInfo : methodInfoList) {
-                        String url = methodInfo.get(0);
-                        String methodName = methodInfo.get(1);
-                        out.println("URL : " + url + "  Classe : " + className + "-> " + methodName);
-                    }
-                }
-            }
+            Mapping mapping = mappingUrls.get("/" + path);
+            if (mapping != null) {
+                out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
+            } else {
+                out.println("Aucune correspondance trouvée pour l'URL : " + path);
+                out.println("Les methodes disponibles sont :");
+                for (Map.Entry<String, Mapping> entry : mappingUrls.entrySet()) {
+                    String url = entry.getKey();
+                    Mapping m = entry.getValue();
+                    out.println("URL: " + url + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
+                }
+            }
         } catch (Exception e) {
-            out.println("Erreur lors de la recherche de la méthode : " + e.getMessage());
+            out.println("Erreur lors du traitement de la requête : " + e.getMessage());
         }
-        
+            
         out.println("---Sprint1---");
         for (String className : controllerClassNames) {
             out.println("Classe trouvée : " + className);
