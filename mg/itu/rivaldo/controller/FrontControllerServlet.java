@@ -9,24 +9,31 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import mg.itu.rivaldo.annotation.Url;
+import mg.itu.rivaldo.annotation.UrlMethod;
+import java.util.Map;
+import java.util.HashMap;
+
+import java.util.ArrayList;
 
 public class FrontControllerServlet extends HttpServlet {
 
     private Util util = new Util();
     private List<String> controllerClassNames;
+    private Map<String, Mapping> mappingUrls = new HashMap<>();
+   
 
     @Override
     public void init() throws ServletException {
         try {
             controllerClassNames = util.getListClassNamesWithAnnotation(
-                "mg.itu.rivaldo.annotation",  // ✅ package du Controller dans la JAR
-                Url.class
-            );
-            System.out.println("Classes trouvées : " + controllerClassNames);
+                "mg.itu.rivaldo.annotation",Url.class,mappingUrls);
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
     }
+
+
+    
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -34,14 +41,32 @@ public class FrontControllerServlet extends HttpServlet {
         response.setContentType("text/plain");
         String uri = request.getRequestURI();
         String path = uri.substring(request.getContextPath().length());
-
+        path = path.substring(1);
         PrintWriter out = response.getWriter();
-        out.println("URL reçue : " + uri);
-        out.println("Chemin    : " + path);
-        out.println("---");
+        try {
+            out.println("URL    : " + path);
+            Mapping mapping = mappingUrls.get("/" + path);
+            if (mapping != null) {
+                out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
+            
+            } else {
+                out.println("Aucune correspondance trouvée pour l'URL : " + path);
+                out.println("Les methodes disponibles sont :");
+                for (Map.Entry<String, Mapping> entry : mappingUrls.entrySet()) {
+                    String url = entry.getKey();
+                    Mapping m = entry.getValue();
+                    out.println("URL: " + url + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
+                }
+            }
+        } catch (Exception e) {
+            out.println("Erreur lors du traitement de la requête : " + e.getMessage());
+        }
+            
+        out.println("---Sprint1---");
         for (String className : controllerClassNames) {
             out.println("Classe trouvée : " + className);
         }
+
     }
 
     @Override
