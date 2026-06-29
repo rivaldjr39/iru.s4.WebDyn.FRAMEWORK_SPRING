@@ -1,6 +1,7 @@
 package mg.itu.rivaldo.controller;
 
 import mg.itu.rivaldo.controller.Mapping;
+import mg.itu.rivaldo.controller.UrlType;
 import jakarta.servlet.ServletContext;
 import java.io.File;
 import java.net.URL;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class Util {
 
 
-    public List<String> getListClassNamesWithAnnotation(String packageName, Class annotationClass,Map<String, Mapping> mappingUrls) {
+    public List<String> getListClassNamesWithAnnotation(String packageName, Class annotationClass,Map<UrlType, Mapping> mappingUrls) {
 
     List<String> result = new ArrayList<>();
     String packagePath = packageName.replace('.', '/');
@@ -50,7 +51,7 @@ public class Util {
     }
     
 
-    private void scanDirectory(File directory,String packageName,Class annotationClass,List<String> result,Map<String, Mapping> mappingUrls) {
+    private void scanDirectory(File directory,String packageName,Class annotationClass,List<String> result,Map<UrlType, Mapping> mappingUrls) {
         File[] files = directory.listFiles();
         if (files == null) return;
         for (File file : files) {
@@ -65,8 +66,8 @@ public class Util {
                                 UrlMethod annotation =
                                         method.getAnnotation(UrlMethod.class);
                                 String url = annotation.value();
-                                mappingUrls.put(url,new Mapping(clazz, method)
-                                );
+                                String verb = annotation.type();
+                                mappingUrls.put(new UrlType(url, verb), new Mapping(clazz, method));
                             }
                         }
                     }
@@ -78,7 +79,7 @@ public class Util {
         }
     }
 
-    private void scanJar(String jarPath,String packagePath,Class annotationClass,List<String> result, Map<String, Mapping> mappingUrls,ClassLoader classLoader) {
+    private void scanJar(String jarPath,String packagePath,Class annotationClass,List<String> result, Map<UrlType, Mapping> mappingUrls,ClassLoader classLoader) {
         try (JarFile jarFile = new JarFile(jarPath)) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -92,11 +93,10 @@ public class Util {
                             result.add(clazz.getName());
                             for (Method method : clazz.getDeclaredMethods()) {
                                 if (method.isAnnotationPresent(UrlMethod.class)) {
-                                    UrlMethod annotation =
-                                            method.getAnnotation(UrlMethod.class);
+                                    UrlMethod annotation = method.getAnnotation(UrlMethod.class);
                                     String url = annotation.value();
-                                    mappingUrls.put(url,new Mapping(clazz, method)
-                                    );
+                                    String verb = annotation.type();
+                                    mappingUrls.put(new UrlType(url, verb), new Mapping(clazz, method));
                                 }
                             }
                         }

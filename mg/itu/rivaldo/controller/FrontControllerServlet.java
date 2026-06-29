@@ -19,7 +19,7 @@ public class FrontControllerServlet extends HttpServlet {
 
     private Util util = new Util();
     private List<String> controllerClassNames;
-    private Map<String, Mapping> mappingUrls = new HashMap<>();
+    private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
    
 
     @Override
@@ -45,17 +45,17 @@ public class FrontControllerServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             out.println("URL    : " + path);
-            Mapping mapping = mappingUrls.get("/" + path);
+            Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
             if (mapping != null) {
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
                 out.println("Aucune correspondance trouvée pour l'URL : " + path);
                 out.println("Les methodes disponibles sont :");
-                for (Map.Entry<String, Mapping> entry : mappingUrls.entrySet()) {
-                    String url = entry.getKey();
+                for (Map.Entry<UrlType, Mapping> entry : mappingUrls.entrySet()) {
+                    UrlType urlType = entry.getKey();
                     Mapping m = entry.getValue();
-                    out.println("URL: " + url + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
+                    out.println("URL: " + urlType.getUrl() + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
                 }
             }
         } catch (Exception e) {
