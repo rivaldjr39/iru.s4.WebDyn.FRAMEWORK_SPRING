@@ -19,7 +19,6 @@ import java.util.Map;
 
 public class Util {
 
-
     public List<String> getListClassNamesWithAnnotation(String packageName, Class annotationClass,Map<UrlType, Mapping> mappingUrls) {
 
     List<String> result = new ArrayList<>();
