@@ -47,6 +47,8 @@ public class FrontControllerServlet extends HttpServlet {
             out.println("URL    : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
             if (mapping != null) {
+                Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
+                Object result = mapping.getMethod().invoke(controllerInstance);
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
