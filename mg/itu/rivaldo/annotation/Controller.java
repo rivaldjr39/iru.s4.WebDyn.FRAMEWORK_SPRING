@@ -7,7 +7,6 @@ public class Controller {
     @UrlMethod(value = "/home", type = "GET")
     public void home() {}
 
-
     @UrlMethod(value = "/home", type = "POST")
     public void about() {}
 }

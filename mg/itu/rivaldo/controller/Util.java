@@ -93,8 +93,7 @@ public class Util {
                             result.add(clazz.getName());
                             for (Method method : clazz.getDeclaredMethods()) {
                                 if (method.isAnnotationPresent(UrlMethod.class)) {
-                                    UrlMethod annotation =
-                                            method.getAnnotation(UrlMethod.class);
+                                    UrlMethod annotation = method.getAnnotation(UrlMethod.class);
                                     String url = annotation.value();
                                     String verb = annotation.type();
                                     mappingUrls.put(new UrlType(url, verb), new Mapping(clazz, method));

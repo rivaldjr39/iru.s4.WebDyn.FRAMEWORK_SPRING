@@ -19,15 +19,17 @@ public class UrlType {
 
 
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
+        if (this == obj){
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()){
+            return false;
+        }
+            
         UrlType urlType = (UrlType) obj;
-
-        if (!url.equals(urlType.url)) return false;
+        if (!url.equals(urlType.url)){
+            return false;
+        }
         return verb.equals(urlType.verb);
-       
     }
-
-    
 }
