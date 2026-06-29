@@ -59,7 +59,7 @@ public class FrontControllerServlet extends HttpServlet {
                 for (Map.Entry<UrlType, Mapping> entry : mappingUrls.entrySet()) {
                     UrlType urlType = entry.getKey();
                     Mapping m = entry.getValue();
-                    out.println("URL: " + urlType.getUrl() + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
+                    out.println("URL: " + urlType.getUrl() + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName() + "  Type: " + urlType.getVerb());
                 }
             }
         } catch (Exception e) {
