@@ -8,7 +8,7 @@ public class Controller {
     }
 
 
-    @UrlMethod(value = "/home", type = "POST")
+    @UrlMethod(value = "/home", type = "GET")
     public void hometypepost() {
         System.out.println("la methode hometypepost() est appelé");
     }
