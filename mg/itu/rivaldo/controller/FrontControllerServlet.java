@@ -9,11 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import mg.itu.rivaldo.annotation.Url;
-import mg.itu.rivaldo.annotation.UrlMethod;
 import java.util.Map;
 import java.util.HashMap;
-
-import java.util.ArrayList;
 
 public class FrontControllerServlet extends HttpServlet {
 
@@ -25,8 +22,9 @@ public class FrontControllerServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         try {
-            controllerClassNames = util.getListClassNamesWithAnnotation(
-                "mg.itu.rivaldo.annotation",Url.class,mappingUrls);
+           String packageName = getServletConfig().getInitParameter("packageNames");
+        controllerClassNames = util.getListClassNamesWithAnnotation(getServletContext(), packageName, Url.class, mappingUrls);
+
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
