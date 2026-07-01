@@ -21,11 +21,14 @@ public class UrlType {
 
     
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj){
             return true;
-
-        if (obj == null || getClass() != obj.getClass())
+        }
+            
+        if (obj == null || getClass() != obj.getClass()){
             return false;
+        }
+            
 
         UrlType urlType = (UrlType) obj;
 

@@ -23,19 +23,14 @@ public class FrontControllerServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
            String packageName = getServletConfig().getInitParameter("packageNames");
-        controllerClassNames = util.getListClassNamesWithAnnotation(getServletContext(), packageName, Url.class, mappingUrls);
+           controllerClassNames = util.getListClassNamesWithAnnotation(getServletContext(), packageName, Url.class, mappingUrls);
 
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
     }
 
-
-    
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
         String uri = request.getRequestURI();
         String path = uri.substring(request.getContextPath().length());
@@ -45,10 +40,8 @@ public class FrontControllerServlet extends HttpServlet {
             out.println("URL    : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
             if (mapping != null) {
-                out.println("AVANT INVOCATION");
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
                 mapping.getMethod().invoke(controllerInstance);
-                out.println("APRES INVOCATION");
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
