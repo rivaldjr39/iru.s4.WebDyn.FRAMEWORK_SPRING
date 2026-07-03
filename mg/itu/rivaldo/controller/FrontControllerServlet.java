@@ -27,8 +27,8 @@ public class FrontControllerServlet extends HttpServlet {
     @SuppressWarnings("unchecked") 
     public void init() throws ServletException {
         try {
-            prefixe = getServletConfig().getInitParameter("prefixe");
-            suffixe = getServletConfig().getInitParameter("suffixe");
+         prefixe = getInitParameter("prefixe");
+         suffixe = getInitParameter("suffixe");
           ServletContext context = getServletContext();
           mappingUrls = (Map<UrlType, Mapping>) context.getAttribute("mappingUrls");
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
@@ -60,6 +60,7 @@ public class FrontControllerServlet extends HttpServlet {
 
                     String chemin = prefixe + modelAndVue.getVue() + suffixe;
                     request.getRequestDispatcher(chemin).forward(request, response);
+                    return;
 
                 } else {
                     out.println("Retour de la méthode : " + retour);
