@@ -2,6 +2,7 @@
 package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,17 +14,19 @@ import java.util.Map;
 import java.util.HashMap;
 
 
-
+@WebServlet(name = "FrontControllerServlet", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
-    private Util util = new Util();
+
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
    
 
-    @Override
+    @Override   
+    @SuppressWarnings("unchecked") 
     public void init() throws ServletException {
         try {
+            
           ServletContext context = getServletContext();
           mappingUrls = (Map<UrlType, Mapping>) context.getAttribute("mappingUrls");
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");

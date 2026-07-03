@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import mg.itu.rivaldo.annotation.Url;
-import mg.itu.rivaldo.controller.Mapping;
-import mg.itu.rivaldo.controller.UrlType;
-import mg.itu.rivaldo.controller.Util;
+
 
 @WebListener
 public class Listner implements ServletContextListener {
