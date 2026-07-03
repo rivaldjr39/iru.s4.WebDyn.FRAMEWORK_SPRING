@@ -2,29 +2,34 @@
 package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import mg.itu.rivaldo.annotation.Url;
 import java.util.Map;
 import java.util.HashMap;
 
+
+@WebServlet(name = "FrontControllerServlet", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
-    private Util util = new Util();
+
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
    
 
-    @Override
+    @Override   
+    @SuppressWarnings("unchecked") 
     public void init() throws ServletException {
         try {
-           String packageName = getServletConfig().getInitParameter("packageNames");
-           controllerClassNames = util.getListClassNamesWithAnnotation(getServletContext(), packageName, Url.class, mappingUrls);
-
+            
+          ServletContext context = getServletContext();
+          mappingUrls = (Map<UrlType, Mapping>) context.getAttribute("mappingUrls");
+          controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
