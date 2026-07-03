@@ -44,9 +44,21 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             out.println("URL    : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
+            
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
-                mapping.getMethod().invoke(controllerInstance);
+                Object retour = mapping.getMethod().invoke(controllerInstance);
+    
+                if(retour instanceof ModelAndVue) {
+                    ModelAndVue modelAndVue = (ModelAndVue) retour;
+                    for(Map.Entry<String, Object> entry : modelAndVue.getData().entrySet()) {
+                        request.setAttribute(entry.getKey(), entry.getValue());
+                    }
+                    request.getRequestDispatcher(modelAndVue.getVue()).forward(request, response);
+                } else {
+                    out.println("Retour de la méthode : " + retour);
+                }
+
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
