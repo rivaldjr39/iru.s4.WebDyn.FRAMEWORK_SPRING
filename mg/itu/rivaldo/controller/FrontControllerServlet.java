@@ -9,11 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import mg.itu.rivaldo.annotation.Url;
-import mg.itu.rivaldo.annotation.UrlMethod;
 import java.util.Map;
 import java.util.HashMap;
-
-import java.util.ArrayList;
 
 public class FrontControllerServlet extends HttpServlet {
 
@@ -25,19 +22,15 @@ public class FrontControllerServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         try {
-            controllerClassNames = util.getListClassNamesWithAnnotation(
-                "mg.itu.rivaldo.annotation",Url.class,mappingUrls);
+           String packageName = getServletConfig().getInitParameter("packageNames");
+           controllerClassNames = util.getListClassNamesWithAnnotation(getServletContext(), packageName, Url.class, mappingUrls);
+
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
     }
 
-
-    
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
         String uri = request.getRequestURI();
         String path = uri.substring(request.getContextPath().length());
@@ -47,6 +40,8 @@ public class FrontControllerServlet extends HttpServlet {
             out.println("URL    : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
             if (mapping != null) {
+                Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
+                mapping.getMethod().invoke(controllerInstance);
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
@@ -55,7 +50,7 @@ public class FrontControllerServlet extends HttpServlet {
                 for (Map.Entry<UrlType, Mapping> entry : mappingUrls.entrySet()) {
                     UrlType urlType = entry.getKey();
                     Mapping m = entry.getValue();
-                    out.println("URL: " + urlType.getUrl() + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName());
+                    out.println("URL: " + urlType.getUrl() + "  Class: " + m.getControllerClass().getSimpleName() + "  -> " + m.getMethod().getName() + "  Type: " + urlType.getVerb());
                 }
             }
         } catch (Exception e) {
