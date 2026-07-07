@@ -17,7 +17,8 @@ import java.util.HashMap;
 @WebServlet(name = "FrontControllerServlet", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
-
+    private String prefixe;
+    private String suffixe;
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
    
@@ -26,7 +27,8 @@ public class FrontControllerServlet extends HttpServlet {
     @SuppressWarnings("unchecked") 
     public void init() throws ServletException {
         try {
-            
+         prefixe = getInitParameter("prefixe");
+         suffixe = getInitParameter("suffixe");
           ServletContext context = getServletContext();
           mappingUrls = (Map<UrlType, Mapping>) context.getAttribute("mappingUrls");
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
@@ -44,9 +46,26 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             out.println("URL    : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
+
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
-                mapping.getMethod().invoke(controllerInstance);
+                Object retour = mapping.getMethod().invoke(controllerInstance);
+    
+                if(retour instanceof ModelAndVue) {
+                    ModelAndVue modelAndVue = (ModelAndVue) retour;
+                    
+                    for(Map.Entry<String, Object> entry : modelAndVue.getData().entrySet()) {
+                        request.setAttribute(entry.getKey(), entry.getValue());
+                    }
+
+                    String chemin = prefixe + modelAndVue.getVue() + suffixe;
+                    request.getRequestDispatcher(chemin).forward(request, response);
+                    return;
+
+                } else {
+                    out.println("Retour de la méthode : " + retour);
+                }
+
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
             
             } else {
