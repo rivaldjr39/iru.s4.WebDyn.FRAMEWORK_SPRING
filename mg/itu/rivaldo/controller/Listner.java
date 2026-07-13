@@ -15,10 +15,13 @@ import mg.itu.rivaldo.annotation.Url;
 
 @WebListener
 public class Listner implements ServletContextListener {
+
     public void contextInitialized(ServletContextEvent sce) {
         try {
             ServletContext context = sce.getServletContext();
             String packageName = context.getInitParameter("packageNames");
+            String prefixe = context.getInitParameter("prefixe");
+            String suffixe = context.getInitParameter("suffixe");
             Util util = new Util();
             Map<UrlType, Mapping> mappingUrls = new HashMap<>();
             List<String> controllerClassNames =
@@ -31,6 +34,8 @@ public class Listner implements ServletContextListener {
 
             context.setAttribute("mappingUrls", mappingUrls);
             context.setAttribute("controllerClassNames", controllerClassNames);
+            context.setAttribute("prefixe", prefixe);
+            context.setAttribute("suffixe", suffixe);
 
             System.out.println("Framework initialisé.");
 
