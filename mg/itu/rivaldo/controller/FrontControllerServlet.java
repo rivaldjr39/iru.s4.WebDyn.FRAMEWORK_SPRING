@@ -27,11 +27,11 @@ public class FrontControllerServlet extends HttpServlet {
     @SuppressWarnings("unchecked") 
     public void init() throws ServletException {
         try {
-         prefixe = getInitParameter("prefixe");
-         suffixe = getInitParameter("suffixe");
           ServletContext context = getServletContext();
           mappingUrls = (Map<UrlType, Mapping>) context.getAttribute("mappingUrls");
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
+          prefixe = (String) context.getAttribute("prefixe");
+          suffixe = (String) context.getAttribute("suffixe");
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
