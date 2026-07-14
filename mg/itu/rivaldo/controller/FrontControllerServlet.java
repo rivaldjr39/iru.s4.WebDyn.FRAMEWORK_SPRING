@@ -12,16 +12,17 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import org.springframework.context.ApplicationContext;
 
 
-@WebServlet(name = "FrontControllerServlet", urlPatterns = {"/"})
+@WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
     private String prefixe;
     private String suffixe;
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
-   
+    private ApplicationContext springContext;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -32,6 +33,7 @@ public class FrontControllerServlet extends HttpServlet {
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
           prefixe = (String) context.getAttribute("prefixe");
           suffixe = (String) context.getAttribute("suffixe");
+          springContext = (ApplicationContext) context.getAttribute("springContext");
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
@@ -49,8 +51,17 @@ public class FrontControllerServlet extends HttpServlet {
 
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
-                Object retour = mapping.getMethod().invoke(controllerInstance);
-    
+                Object retour;
+                //verification si la méthode a des paramètres
+                Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
+                if(parameterTypes.length == 0){
+                    retour = mapping.getMethod().invoke(controllerInstance);
+                }else if(parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(springContext.getClass())){
+                    retour = mapping.getMethod().invoke(controllerInstance, springContext);
+                }else {
+                    out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
+                    return;
+                }
                 if(retour instanceof ModelAndVue) {
                     ModelAndVue modelAndVue = (ModelAndVue) retour;
                     
@@ -100,3 +111,9 @@ public class FrontControllerServlet extends HttpServlet {
         processRequest(req, res);
     }
 }
+
+
+
+
+
+

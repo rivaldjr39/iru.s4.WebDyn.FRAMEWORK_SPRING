@@ -5,6 +5,10 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +19,10 @@ import mg.itu.rivaldo.annotation.Url;
 
 @WebListener
 public class Listner implements ServletContextListener {
-
     public void contextInitialized(ServletContextEvent sce) {
         try {
             ServletContext context = sce.getServletContext();
+            ApplicationContext springContext = WebApplicationContextUtils.getWebApplicationContext(context);
             String packageName = context.getInitParameter("packageNames");
             String prefixe = context.getInitParameter("prefixe");
             String suffixe = context.getInitParameter("suffixe");
@@ -36,6 +40,7 @@ public class Listner implements ServletContextListener {
             context.setAttribute("controllerClassNames", controllerClassNames);
             context.setAttribute("prefixe", prefixe);
             context.setAttribute("suffixe", suffixe);
+            context.setAttribute("springContext", springContext);
 
             System.out.println("Framework initialisé.");
 
