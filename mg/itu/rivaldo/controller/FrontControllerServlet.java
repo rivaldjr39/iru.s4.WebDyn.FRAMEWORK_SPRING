@@ -15,7 +15,7 @@ import java.util.HashMap;
 import org.springframework.web.context.WebApplicationContext;
 
 
-@WebServlet(name = "FrontControllerServlet", urlPatterns = {"/"})
+@WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
     private String prefixe;
@@ -56,7 +56,7 @@ public class FrontControllerServlet extends HttpServlet {
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
                 if(parameterTypes.length == 0){
                     retour = mapping.getMethod().invoke(controllerInstance);
-                }else if(parameterTypes.length == 1 && WebApplicationContext.class.isAssignableFrom(parameterTypes[0])){
+                }else if(parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(springContext.getClass())){
                     retour = mapping.getMethod().invoke(controllerInstance, springContext);
                 }else {
                     out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
@@ -111,3 +111,9 @@ public class FrontControllerServlet extends HttpServlet {
         processRequest(req, res);
     }
 }
+
+
+
+
+
+
