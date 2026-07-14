@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 
 @WebServlet(name = "FrontController", urlPatterns = {"/"})
@@ -22,7 +22,7 @@ public class FrontControllerServlet extends HttpServlet {
     private String suffixe;
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
-    private WebApplicationContext springContext;
+    private ApplicationContext springContext;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -33,7 +33,7 @@ public class FrontControllerServlet extends HttpServlet {
           controllerClassNames = (List<String>) context.getAttribute("controllerClassNames");
           prefixe = (String) context.getAttribute("prefixe");
           suffixe = (String) context.getAttribute("suffixe");
-          springContext = (WebApplicationContext) context.getAttribute("springContext");
+          springContext = (ApplicationContext) context.getAttribute("springContext");
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }

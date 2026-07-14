@@ -5,7 +5,8 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
@@ -21,7 +22,7 @@ public class Listner implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             ServletContext context = sce.getServletContext();
-            WebApplicationContext springContext = WebApplicationContextUtils.getWebApplicationContext(context);
+            ApplicationContext springContext = WebApplicationContextUtils.getWebApplicationContext(context);
             String packageName = context.getInitParameter("packageNames");
             String prefixe = context.getInitParameter("prefixe");
             String suffixe = context.getInitParameter("suffixe");
