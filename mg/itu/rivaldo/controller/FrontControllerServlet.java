@@ -62,17 +62,23 @@ public class FrontControllerServlet extends HttpServlet {
                     out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
                     return;
                 }
+
+                //verification si le retour a l'annotation RestAp
                 if(retour instanceof ModelAndVue) {
                     ModelAndVue modelAndVue = (ModelAndVue) retour;
                     
                     for(Map.Entry<String, Object> entry : modelAndVue.getData().entrySet()) {
                         request.setAttribute(entry.getKey(), entry.getValue());
                     }
-
-                    String chemin = prefixe + modelAndVue.getVue() + suffixe;
-                    request.getRequestDispatcher(chemin).forward(request, response);
-                    return;
-
+                     if(mapping.getMethod().isAnnotationPresent(mg.itu.rivaldo.annotation.RestApi.class)) {
+                        response.setContentType("application/json");
+                        out.println(retour);
+                        return;
+                    }else{
+                        String chemin = prefixe + modelAndVue.getVue() + suffixe;
+                        request.getRequestDispatcher(chemin).forward(request, response);
+                        return;
+                    }
                 } else {
                     out.println("Retour de la méthode : " + retour);
                 }
