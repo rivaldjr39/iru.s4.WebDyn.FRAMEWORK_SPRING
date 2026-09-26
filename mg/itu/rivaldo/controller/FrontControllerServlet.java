@@ -7,13 +7,15 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import mg.itu.rivaldo.annotation.RestApi;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import org.springframework.context.ApplicationContext;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
@@ -46,7 +48,7 @@ public class FrontControllerServlet extends HttpServlet {
         path = path.substring(1);
         PrintWriter out = response.getWriter();
         try {
-            out.println("URL    : " + path);
+            System.out.println("URL : " + path);
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
 
             if (mapping != null) {
@@ -62,17 +64,31 @@ public class FrontControllerServlet extends HttpServlet {
                     out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
                     return;
                 }
+
+                if (mapping.getMethod().isAnnotationPresent(RestApi.class)) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+
+                    if (retour instanceof String) {
+                        response.getWriter().write((String) retour);
+                    } else {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        String jsonResponse = objectMapper.writeValueAsString(retour);
+                        response.getWriter().write(jsonResponse);
+                    }  
+                    return;
+                }
+
                 if(retour instanceof ModelAndVue) {
                     ModelAndVue modelAndVue = (ModelAndVue) retour;
-                    
+
                     for(Map.Entry<String, Object> entry : modelAndVue.getData().entrySet()) {
                         request.setAttribute(entry.getKey(), entry.getValue());
                     }
-
+                   
                     String chemin = prefixe + modelAndVue.getVue() + suffixe;
                     request.getRequestDispatcher(chemin).forward(request, response);
                     return;
-
                 } else {
                     out.println("Retour de la méthode : " + retour);
                 }
