@@ -94,7 +94,7 @@ public class FrontControllerServlet extends HttpServlet {
                 }
 
                 out.println("URL:"+ path + "  Class :" + mapping.getControllerClass().getSimpleName() + "  -> " + mapping.getMethod().getName());
-            
+
             } else {
                 out.println("Aucune correspondance trouvée pour l'URL : " + path);
                 out.println("Les methodes disponibles sont :");
