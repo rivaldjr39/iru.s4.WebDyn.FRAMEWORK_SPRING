@@ -54,26 +54,59 @@ public class FrontControllerServlet extends HttpServlet {
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
                 Object retour;
+                
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
 
-                if(parameterTypes.length == 0){
+                if (parameterTypes.length == 0) {
+                    // Méthode sans paramètre
                     retour = mapping.getMethod().invoke(controllerInstance);
-
-                } else if(parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(springContext.getClass())){
-
-                    Object[] parameters = new Object[parameterTypes.length];
-                    for(int i = 0; i < parameterTypes.length; i++) {
-                        String parameterName = mapping.getMethod().getParameters()[i].getName();
-                        parameters[i] = request.getParameter(parameterName);
-                    }
-                    retour = mapping.getMethod().invoke(controllerInstance, parameters);
 
                 } else {
 
-                    out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
-                    return;
-                    
+                    Object[] parameters = new Object[parameterTypes.length];
+                    for (int i = 0; i < parameterTypes.length; i++) {
+                        Class<?> parameterType = parameterTypes[i];
+
+                        // Cas ApplicationContext
+                        if (ApplicationContext.class.isAssignableFrom(parameterType)) {
+
+                            parameters[i] = springContext;
+
+                        }
+
+                        // Cas String
+                        else if (parameterType == String.class) {
+                            String parameterName = mapping.getMethod().getParameters()[i].getName();
+                            parameters[i] = request.getParameter(parameterName);
+
+                        }
+
+                        // Cas int
+                        else if (parameterType == int.class || parameterType == Integer.class) {
+                            String parameterName = mapping.getMethod().getParameters()[i].getName();
+                            String value = request.getParameter(parameterName);
+                            parameters[i] = Integer.parseInt(value);
+
+                        }
+
+                        // Cas double
+                        else if (parameterType == double.class || parameterType == Double.class) {
+                            String parameterName = mapping.getMethod().getParameters()[i].getName();
+                            String value = request.getParameter(parameterName);
+                            parameters[i] = Double.parseDouble(value);
+
+                        }
+
+                        // Type non supporté
+                        else {
+
+                            out.println("Type de paramètre non supporté : "+ parameterType.getName());
+                            return;
+                        }
+                    }
+
+                    retour = mapping.getMethod().invoke(controllerInstance, parameters);
                 }
 
                 if (mapping.getMethod().isAnnotationPresent(RestApi.class)) {
