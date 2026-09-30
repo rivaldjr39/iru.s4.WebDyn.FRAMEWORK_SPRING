@@ -56,13 +56,24 @@ public class FrontControllerServlet extends HttpServlet {
                 Object retour;
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
+
                 if(parameterTypes.length == 0){
                     retour = mapping.getMethod().invoke(controllerInstance);
-                }else if(parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(springContext.getClass())){
-                    retour = mapping.getMethod().invoke(controllerInstance, springContext);
-                }else {
+
+                } else if(parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(springContext.getClass())){
+
+                    Object[] parameters = new Object[parameterTypes.length];
+                    for(int i = 0; i < parameterTypes.length; i++) {
+                        String parameterName = mapping.getMethod().getParameters()[i].getName();
+                        parameters[i] = request.getParameter(parameterName);
+                    }
+                    retour = mapping.getMethod().invoke(controllerInstance, parameters);
+
+                } else {
+
                     out.println("La méthode " + mapping.getMethod().getName() + " de la classe " + mapping.getControllerClass().getSimpleName() + " a des paramètres non supportés.");
                     return;
+                    
                 }
 
                 if (mapping.getMethod().isAnnotationPresent(RestApi.class)) {
