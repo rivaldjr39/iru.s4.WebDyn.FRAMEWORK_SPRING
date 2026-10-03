@@ -70,9 +70,7 @@ public class FrontControllerServlet extends HttpServlet {
 
                         // Cas ApplicationContext
                         if (ApplicationContext.class.isAssignableFrom(parameterType)) {
-
                             parameters[i] = springContext;
-
                         }
 
                         // Cas String
