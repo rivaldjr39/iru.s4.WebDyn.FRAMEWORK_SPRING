@@ -11,11 +11,13 @@ import mg.itu.rivaldo.annotation.RestApi;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Method;
 
 @WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
@@ -96,11 +98,30 @@ public class FrontControllerServlet extends HttpServlet {
 
                         }
 
-                        // Type non supporté
+                        // parametre de type objet (classe)
                         else {
+                            Object obj = parameterType.getDeclaredConstructor().newInstance();
+                            Method[] objMethods = parameterType.getDeclaredMethods();
 
-                            out.println("Type de paramètre non supporté : "+ parameterType.getName());
-                            return;
+                            for (Method method : objMethods) {
+                                String methodName = method.getName();
+
+                                if (methodName.startsWith("set") && method.getParameterCount() == 1) {
+                                    String propertyName = methodName.substring(3);
+                                    propertyName = Character.toLowerCase(propertyName.charAt(0)) + propertyName.substring(1);
+                                    String parameterValue = request.getParameter(propertyName);
+
+                                    if (parameterValue == null) {
+                                        continue;
+                                    }
+                                    
+                                    Class<?> settertype = method.getParameterTypes()[0];
+                                    Object convertedValue = convertValue(parameterValue, settertype);
+                                    method.invoke(obj, convertedValue);
+                                }
+                            }
+                            parameters[i] = obj;
+
                         }
                     }
 
@@ -156,6 +177,48 @@ public class FrontControllerServlet extends HttpServlet {
         }
 
     }
+    private Object convertValue(String value, Class<?> type) {
+
+    if (type == String.class) {
+        return value;
+    }
+
+    if (type == int.class || type == Integer.class) {
+        return Integer.parseInt(value);
+    }
+
+    if (type == double.class || type == Double.class) {
+        return Double.parseDouble(value);
+    }
+
+    if (type == long.class || type == Long.class) {
+        return Long.parseLong(value);
+    }
+
+    if (type == float.class || type == Float.class) {
+        return Float.parseFloat(value);
+    }
+
+    if (type == boolean.class || type == Boolean.class) {
+        return Boolean.parseBoolean(value);
+    }
+
+    if (type == short.class || type == Short.class) {
+        return Short.parseShort(value);
+    }
+
+    if (type == byte.class || type == Byte.class) {
+        return Byte.parseByte(value);
+    }
+
+    if (type == char.class || type == Character.class) {
+        return value.charAt(0);
+    }
+
+    throw new IllegalArgumentException(
+        "Type non supporté : " + type.getName()
+    );
+}
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
