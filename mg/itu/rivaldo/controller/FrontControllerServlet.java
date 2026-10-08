@@ -8,10 +8,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.rivaldo.annotation.RestApi;
+import mg.itu.rivaldo.controller.BindingUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -98,29 +98,11 @@ public class FrontControllerServlet extends HttpServlet {
                         }
 
                         // parametre de type objet (classe)
-                        else {
-                            Object obj = parameterType.getDeclaredConstructor().newInstance();
-                            Method[] objMethods = parameterType.getDeclaredMethods();
-
-                            for (Method method : objMethods) {
-                                String methodName = method.getName();
-
-                                if (methodName.startsWith("set") && method.getParameterCount() == 1) {
-                                    String propertyName = methodName.substring(3);
-                                    propertyName = Character.toLowerCase(propertyName.charAt(0)) + propertyName.substring(1);
-                                    String parameterValue = request.getParameter(propertyName);
-
-                                    if (parameterValue == null) {
-                                        continue;
-                                    }
-                                    
-                                    Class<?> settertype = method.getParameterTypes()[0];
-                                    Object convertedValue = convertValue(parameterValue, settertype);
-                                    method.invoke(obj, convertedValue);
-                                }
-                            }
-                            parameters[i] = obj;
-
+                        else{
+                            
+                            Object paramObject = BindingUtil.bindObject(parameterType, request);
+                            parameters[i] = paramObject;
+                           
                         }
                     }
 
