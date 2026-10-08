@@ -18,7 +18,7 @@ public class BindingUtil {
 
             Param param = field.getAnnotation(Param.class);
             String inputName = param.value();
-
+            
             String parameterValue = request.getParameter(inputName);
             Class<?> fieldType = field.getType();
 
