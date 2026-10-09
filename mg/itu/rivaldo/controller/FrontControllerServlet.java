@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.rivaldo.annotation.RestApi;
+import mg.itu.rivaldo.controller.BindingUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -96,11 +97,12 @@ public class FrontControllerServlet extends HttpServlet {
 
                         }
 
-                        // Type non supporté
-                        else {
-
-                            out.println("Type de paramètre non supporté : "+ parameterType.getName());
-                            return;
+                        // parametre de type objet (classe)
+                        else{
+                            
+                            Object paramObject = BindingUtil.bindObject(parameterType, request);
+                            parameters[i] = paramObject;
+                           
                         }
                     }
 
