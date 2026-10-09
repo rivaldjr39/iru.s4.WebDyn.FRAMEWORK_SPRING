@@ -4,17 +4,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BindingUtil {
 
     public static Object bindObject(Class<?> objectType, HttpServletRequest request) throws Exception {
 
-        // Création de l'objet
         Object obj = objectType.getDeclaredConstructor().newInstance();
-
-        // Parcours des champs de la classe
-        Field[] fields = objectType.getDeclaredFields();
-
+        Field[] fields = getallFields(objectType);
+        
         for (Field field : fields) {
 
             Class<?> fieldType = field.getType();
@@ -117,5 +117,17 @@ public class BindingUtil {
         throw new IllegalArgumentException(
                 "Type non supporté : " + type.getName()
         );
+    }
+
+    private static Field[] getallFields(Class<?> type) {
+
+        List<Field> fields = new ArrayList<>();
+        Class<?> currentType = type;
+
+        while(currentType != null) {
+            fields.addAll(Arrays.asList(currentType.getDeclaredFields()));
+            currentType = currentType.getSuperclass();
+        }
+        return fields.toArray(new Field[0]);
     }
 }
