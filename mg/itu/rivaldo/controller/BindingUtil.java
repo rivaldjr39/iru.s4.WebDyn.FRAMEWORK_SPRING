@@ -3,6 +3,7 @@ package mg.itu.rivaldo.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import mg.itu.rivaldo.annotation.Param;
 import java.lang.reflect.Field;
+import java.sql.Date;
 
 public class BindingUtil {
 
@@ -56,7 +57,8 @@ public class BindingUtil {
                 || type == byte.class
                 || type == Byte.class
                 || type == char.class
-                || type == Character.class;
+                || type == Character.class
+                || type == Date.class;
     }
 
 
@@ -99,6 +101,9 @@ public class BindingUtil {
             return value.charAt(0);
         }
 
+        if (type == Date.class) {
+            return Date.valueOf(value);
+        }
         throw new IllegalArgumentException(
                 "Type non supporté : " + type.getName()
         );
