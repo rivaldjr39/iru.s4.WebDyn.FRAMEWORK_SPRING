@@ -136,47 +136,32 @@ public class BindingUtil {
         );
     }
 
-    private static Mapfile bindFile(
-        HttpServletRequest request,
-        String name
-) throws Exception {
+    private static Mapfile bindFile(HttpServletRequest request,String name) throws Exception {
 
-    System.out.println("=== DEBUT BIND FILE ===");
-    System.out.println("Nom du champ : " + name);
-    System.out.println("Content-Type : " + request.getContentType());
+        Part part = request.getPart(name);
+        if (part == null) {
+            System.out.println("ERREUR : part est null !");
+            return null;
+        }
+        if (part.getSize() == 0) {
+            System.out.println("ERREUR : fichier vide !");
+            return null;
+        }
 
-    Part part = request.getPart(name);
+        Mapfile mapfile = new Mapfile();
+        String fileName = part.getSubmittedFileName();
 
-    if (part == null) {
-        System.out.println("ERREUR : part est null !");
-        return null;
+        mapfile.setNom(fileName);
+
+        int index = fileName.lastIndexOf('.');
+        if (index >= 0) {
+            mapfile.setExtension(fileName.substring(index));
+        }
+
+        try (InputStream input = part.getInputStream()) {
+            mapfile.setData(input.readAllBytes());
+        }
+        return mapfile;
     }
-
-    System.out.println("Nom du fichier : " + part.getSubmittedFileName());
-    System.out.println("Taille du fichier : " + part.getSize());
-
-    if (part.getSize() == 0) {
-        System.out.println("ERREUR : fichier vide !");
-        return null;
-    }
-
-    Mapfile mapfile = new Mapfile();
-    String fileName = part.getSubmittedFileName();
-
-    mapfile.setNom(fileName);
-
-    int index = fileName.lastIndexOf('.');
-    if (index >= 0) {
-        mapfile.setExtension(fileName.substring(index));
-    }
-
-    try (InputStream input = part.getInputStream()) {
-        mapfile.setData(input.readAllBytes());
-    }
-
-    System.out.println("Fichier récupéré : " + mapfile.getNom());
-
-    return mapfile;
-}
 }
 
