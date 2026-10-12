@@ -105,13 +105,8 @@ public class FrontControllerServlet extends HttpServlet {
 
                         // parametre de type objet (classe)
                         else{
-<<<<<<< Updated upstream
                             Object paramObject = BindingUtil.bindObject(parameterType, request);
                             parameters[i] = paramObject;
-=======
-                            Object obj = BindingUtil.bindObject(parameterType, request);
-                            parameters[i] = obj;
->>>>>>> Stashed changes
                            
                         }
                     }

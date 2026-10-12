@@ -2,7 +2,6 @@ package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-<<<<<<< Updated upstream
 import java.lang.reflect.Field;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -71,57 +70,30 @@ public class BindingUtil {
             currentType = currentType.getSuperclass();
         }
         return fields.toArray(new Field[0]);
-=======
-import java.lang.reflect.*;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.*;
-
-public class BindingUtil {
-
-    // Point d'entrée : créer et remplir un objet
-    public static Object bindObject(Class<?> objectType,
-                                    HttpServletRequest request) throws Exception {
-        Object obj = objectType.getDeclaredConstructor().newInstance();
-        bindFields(obj, objectType, request, "");
-        return obj;
->>>>>>> Stashed changes
     }
 
-    // Parcourir tous les attributs de l'objet
-    private static void bindFields(Object obj, Class<?> type,
-                                   HttpServletRequest request,
-                                   String prefix) throws Exception {
-
-        for (Field field : getAllFields(type)) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-
-            field.setAccessible(true);
-
-            Class<?> fieldType = field.getType();
-            String name = prefix.isEmpty()
-                    ? field.getName()
-                    : prefix + "." + field.getName();
-
-            if (isSimpleType(fieldType)) {
-                String value = request.getParameter(name);
-
-                if (value != null && !value.isEmpty()) {
-                    field.set(obj, convertValue(value, fieldType));
-                }
-            } else if (Collection.class.isAssignableFrom(fieldType)) {
-                bindList(obj, field, request, name);
-            } else if (fieldType.isArray()) {
-                bindArray(obj, field, request, name);
-            } else if (!fieldType.isEnum() && !Map.class.isAssignableFrom(fieldType)) {
-                bindNestedObject(obj, field, request, name);
-            }
-        }
+    private static boolean isSimpleType(Class<?> type) {
+        return type == String.class
+                || type == int.class
+                || type == Integer.class
+                || type == double.class
+                || type == Double.class
+                || type == long.class
+                || type == Long.class
+                || type == float.class
+                || type == Float.class
+                || type == boolean.class
+                || type == Boolean.class
+                || type == short.class
+                || type == Short.class
+                || type == byte.class
+                || type == Byte.class
+                || type == char.class
+                || type == Character.class
+                || type == Date.class
+                || type == LocalDate.class;
     }
 
-<<<<<<< Updated upstream
     private static Object convertValue(String value,Class<?> type ) {
         if (type == String.class) {
             return value;
@@ -208,178 +180,3 @@ public class BindingUtil {
 }
 }
 
-=======
-    // Gérer les objets imbriqués : personne.nom
-    private static void bindNestedObject(Object obj, Field field,
-                                         HttpServletRequest request,
-                                         String name) throws Exception {
-
-        boolean exists = request.getParameterMap().keySet().stream()
-                .anyMatch(key -> key.startsWith(name + "."));
-
-        if (!exists) {
-            return;
-        }
-
-        Object child = field.getType().getDeclaredConstructor().newInstance();
-
-        bindFields(child, field.getType(), request, name);
-        field.set(obj, child);
-    }
-
-    // Gérer les listes : personnes[0].nom
-    private static void bindList(Object obj, Field field,
-                                 HttpServletRequest request,
-                                 String name) throws Exception {
-
-        Type genericType = field.getGenericType();
-
-        if (!(genericType instanceof ParameterizedType)) {
-            return;
-        }
-
-        Type elementType = ((ParameterizedType) genericType)
-                .getActualTypeArguments()[0];
-
-        Class<?> elementClass = getClassType(elementType);
-
-        if (elementClass == null) {
-            return;
-        }
-
-        List<Object> list = new ArrayList<>();
-
-        for (int i : getIndexes(request, name)) {
-            String itemName = name + "[" + i + "]";
-
-            if (isSimpleType(elementClass)) {
-                String value = request.getParameter(itemName);
-
-                if (value != null) {
-                    list.add(convertValue(value, elementClass));
-                }
-            } else {
-                Object item = elementClass.getDeclaredConstructor().newInstance();
-                bindFields(item, elementClass, request, itemName);
-                list.add(item);
-            }
-        }
-
-        // ArrayList est compatible avec List et la plupart des interfaces de collection.
-        if (field.getType().isAssignableFrom(ArrayList.class)) {
-            field.set(obj, list);
-        }
-    }
-
-    // Gérer les tableaux : personnes[0].nom
-    private static void bindArray(Object obj, Field field,
-                                  HttpServletRequest request,
-                                  String name) throws Exception {
-
-        Class<?> elementClass = field.getType().getComponentType();
-        List<Object> values = new ArrayList<>();
-
-        for (int i : getIndexes(request, name)) {
-            String itemName = name + "[" + i + "]";
-
-            if (isSimpleType(elementClass)) {
-                String value = request.getParameter(itemName);
-
-                if (value != null) {
-                    values.add(convertValue(value, elementClass));
-                }
-            } else {
-                Object item = elementClass.getDeclaredConstructor().newInstance();
-                bindFields(item, elementClass, request, itemName);
-                values.add(item);
-            }
-        }
-
-        Object array = Array.newInstance(elementClass, values.size());
-
-        for (int i = 0; i < values.size(); i++) {
-            Array.set(array, i, values.get(i));
-        }
-
-        field.set(obj, array);
-    }
-
-    // Récupérer les indices présents dans les paramètres
-    private static Set<Integer> getIndexes(HttpServletRequest request,String name) {
-        Set<Integer> indexes = new TreeSet<>();
-
-        for (String key : request.getParameterMap().keySet()) {
-            if (key.startsWith(name + "[")) {
-                int start = name.length() + 1;
-                int end = key.indexOf("]", start);
-
-                if (end > start) {
-                    try {
-                        indexes.add(Integer.parseInt(key.substring(start, end)));
-                    } catch (NumberFormatException ignored) {
-                        // Ignorer les indices invalides
-                    }
-                }
-            }
-        }
-
-        return indexes;
-    }
-
-    // Récupérer la classe d'un type
-    private static Class<?> getClassType(Type type) {
-        if (type instanceof Class<?>) {
-            return (Class<?>) type;
-        }
-
-        if (type instanceof ParameterizedType) {
-            return (Class<?>) ((ParameterizedType) type).getRawType();
-        }
-
-        return null;
-    }
-
-    // Récupérer les attributs de la classe et de ses parents
-    private static Field[] getAllFields(Class<?> type) {
-        List<Field> fields = new ArrayList<>();
-
-        while (type != null && type != Object.class) {
-            fields.addAll(Arrays.asList(type.getDeclaredFields()));
-            type = type.getSuperclass();
-        }
-
-        return fields.toArray(new Field[0]);
-    }
-
-    // Identifier les types simples
-    private static boolean isSimpleType(Class<?> type) {
-        return type == String.class
-                || type == int.class || type == Integer.class
-                || type == double.class || type == Double.class
-                || type == long.class || type == Long.class
-                || type == float.class || type == Float.class
-                || type == boolean.class || type == Boolean.class
-                || type == short.class || type == Short.class
-                || type == byte.class || type == Byte.class
-                || type == char.class || type == Character.class
-                || type == Date.class || type == LocalDate.class;
-    }
-
-    // Convertir une chaîne vers le type Java demandé
-    private static Object convertValue(String value, Class<?> type) {
-        if (type == String.class) return value;
-        if (type == int.class || type == Integer.class) return Integer.parseInt(value);
-        if (type == double.class || type == Double.class) return Double.parseDouble(value);
-        if (type == long.class || type == Long.class) return Long.parseLong(value);
-        if (type == float.class || type == Float.class) return Float.parseFloat(value);
-        if (type == boolean.class || type == Boolean.class) return Boolean.parseBoolean(value);
-        if (type == short.class || type == Short.class) return Short.parseShort(value);
-        if (type == byte.class || type == Byte.class) return Byte.parseByte(value);
-        if (type == char.class || type == Character.class) return value.charAt(0);
-        if (type == Date.class) return Date.valueOf(value);
-        if (type == LocalDate.class) return LocalDate.parse(value);
-
-        throw new IllegalArgumentException("Type non supporté : " + type.getName());
-    }
-}
->>>>>>> Stashed changes
