@@ -16,7 +16,14 @@ import java.util.Map;
 import java.util.HashMap;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.annotation.MultipartConfig;
 
+
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 5 * 1024 * 1024,
+    maxRequestSize = 10 * 1024 * 1024
+)
 @WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 

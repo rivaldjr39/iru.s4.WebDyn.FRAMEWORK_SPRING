@@ -10,6 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import jakarta.servlet.http.Part;
+import mg.itu.rivaldo.annotation.Mapfile;
+
+import java.io.InputStream;
 
 public class BindingUtil {
 
@@ -27,8 +31,14 @@ public class BindingUtil {
             Class<?> fieldType = field.getType();
             String fieldName = prefix.isEmpty()? field.getName(): prefix + "." + field.getName();
 
-            // 1. Attribut de type simple
-            if (isSimpleType(fieldType)) {
+            if (fieldType == Mapfile.class) {
+                Mapfile file = bindFile(request, fieldName);
+
+                if (file != null) {
+                    field.set(obj, file);
+                }
+            }
+            else if (isSimpleType(fieldType)) {
                 String value = request.getParameter(fieldName);
                 if (value == null || value.isEmpty()) {
                     continue;
@@ -125,4 +135,48 @@ public class BindingUtil {
                 "Type non supporté : " + type.getName()
         );
     }
+
+    private static Mapfile bindFile(
+        HttpServletRequest request,
+        String name
+) throws Exception {
+
+    System.out.println("=== DEBUT BIND FILE ===");
+    System.out.println("Nom du champ : " + name);
+    System.out.println("Content-Type : " + request.getContentType());
+
+    Part part = request.getPart(name);
+
+    if (part == null) {
+        System.out.println("ERREUR : part est null !");
+        return null;
+    }
+
+    System.out.println("Nom du fichier : " + part.getSubmittedFileName());
+    System.out.println("Taille du fichier : " + part.getSize());
+
+    if (part.getSize() == 0) {
+        System.out.println("ERREUR : fichier vide !");
+        return null;
+    }
+
+    Mapfile mapfile = new Mapfile();
+    String fileName = part.getSubmittedFileName();
+
+    mapfile.setNom(fileName);
+
+    int index = fileName.lastIndexOf('.');
+    if (index >= 0) {
+        mapfile.setExtension(fileName.substring(index));
+    }
+
+    try (InputStream input = part.getInputStream()) {
+        mapfile.setData(input.readAllBytes());
+    }
+
+    System.out.println("Fichier récupéré : " + mapfile.getNom());
+
+    return mapfile;
 }
+}
+
