@@ -136,8 +136,7 @@ public class BindingUtil {
         );
     }
 
-    private static Mapfile bindFile(HttpServletRequest request,String name) throws Exception {
-
+    private static Mapfile bindFile(HttpServletRequest request, String name) throws Exception {
         Part part = request.getPart(name);
         if (part == null) {
             System.out.println("ERREUR : part est null !");
@@ -155,7 +154,7 @@ public class BindingUtil {
 
         int index = fileName.lastIndexOf('.');
         if (index >= 0) {
-            mapfile.setExtension(fileName.substring(index));
+            mapfile.setExtension(fileName.substring(index));   // garde le point : ".png"
         }
 
         try (InputStream input = part.getInputStream()) {
