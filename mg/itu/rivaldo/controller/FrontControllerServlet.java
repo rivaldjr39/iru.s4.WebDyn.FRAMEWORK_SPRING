@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.rivaldo.annotation.RestApi;
-import mg.itu.rivaldo.controller.BindingUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,7 +16,14 @@ import java.util.Map;
 import java.util.HashMap;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.annotation.MultipartConfig;
 
+
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 5 * 1024 * 1024,
+    maxRequestSize = 10 * 1024 * 1024
+)
 @WebServlet(name = "FrontController", urlPatterns = {"/"})
 public class FrontControllerServlet extends HttpServlet {
 
@@ -99,7 +105,6 @@ public class FrontControllerServlet extends HttpServlet {
 
                         // parametre de type objet (classe)
                         else{
-                            
                             Object paramObject = BindingUtil.bindObject(parameterType, request);
                             parameters[i] = paramObject;
                            
