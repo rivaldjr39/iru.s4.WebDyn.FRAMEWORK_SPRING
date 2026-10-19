@@ -68,6 +68,9 @@ public class FrontControllerServlet extends HttpServlet {
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
 
+                Session session = null;
+                HttpSession httpSession = null;
+
                 if (parameterTypes.length == 0) {
                     // Méthode sans paramètre
                     retour = mapping.getMethod().invoke(controllerInstance);
@@ -106,17 +109,15 @@ public class FrontControllerServlet extends HttpServlet {
 
                         } 
 
-                        else if(parameterType == Session.class) {
-
-                            HttpSession httpSession = request.getSession();
-                            Session session = sessionData.get(httpSession);
+                        else if (parameterType == Session.class) {
+                            httpSession = request.getSession();
                             if (session == null) {
                                 session = new Session();
-                                sessionData.put(httpSession, session);
+                                session.loadFrom(httpSession);  
                             }
                             parameters[i] = session;
                         }
-                        
+                                                
                         // Objet
                         else{ 
                             Object paramObject = BindingUtil.bindObject(parameterType, request);
@@ -125,6 +126,10 @@ public class FrontControllerServlet extends HttpServlet {
                     }
 
                     retour = mapping.getMethod().invoke(controllerInstance, parameters);
+
+                    if (session != null) {
+                        session.applyTo(httpSession); 
+                    }
                 }
 
                 if (mapping.getMethod().isAnnotationPresent(RestApi.class)) {
