@@ -1,4 +1,3 @@
-// FrontControllerServlet.java - version corrigée
 package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.ServletException;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import mg.itu.rivaldo.annotation.Session;
+import mg.itu.rivaldo.util.BindingUtil;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -34,7 +34,6 @@ public class FrontControllerServlet extends HttpServlet {
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
     private ApplicationContext springContext;
-    private Map<HttpSession, Session> sessionData = new HashMap<>();
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -194,7 +193,6 @@ public class FrontControllerServlet extends HttpServlet {
         processRequest(req, res);
     }
 }
-
 
 
 

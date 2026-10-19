@@ -1,4 +1,4 @@
-package mg.itu.rivaldo.controller;
+package mg.itu.rivaldo.util;
 import jakarta.servlet.ServletContext;
 import java.io.File;
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.lang.reflect.Method;
 import mg.itu.rivaldo.annotation.UrlMethod;
+import mg.itu.rivaldo.controller.Mapping;
+import mg.itu.rivaldo.controller.UrlType;
 import java.util.Map;
 import java.net.URL;
 

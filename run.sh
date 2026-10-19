@@ -3,7 +3,7 @@
 rm -rf build
 mkdir -p build
 
-javac --release 21 -cp "lib/*" -d build $(find mg -name "*.java")
+javac --release 21 -cp "lib/*" -d build $(find src/main/java -name "*.java")
 
 if [ $? -ne 0 ]; then
     echo "Erreur de compilation"
