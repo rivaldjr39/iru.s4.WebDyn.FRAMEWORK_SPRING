@@ -7,6 +7,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import mg.itu.rivaldo.annotation.RestApi;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import mg.itu.rivaldo.annotation.Session;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -32,6 +34,7 @@ public class FrontControllerServlet extends HttpServlet {
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
     private ApplicationContext springContext;
+    private Map<HttpSession, Session> sessionData = new HashMap<>();
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -101,13 +104,23 @@ public class FrontControllerServlet extends HttpServlet {
                             String value = request.getParameter(parameterName);
                             parameters[i] = Double.parseDouble(value);
 
-                        }
+                        } 
 
-                        // parametre de type objet (classe)
-                        else{
+                        else if(parameterType == Session.class) {
+
+                            HttpSession httpSession = request.getSession();
+                            Session session = sessionData.get(httpSession);
+                            if (session == null) {
+                                session = new Session();
+                                sessionData.put(httpSession, session);
+                            }
+                            parameters[i] = session;
+                        }
+                        
+                        // Objet
+                        else{ 
                             Object paramObject = BindingUtil.bindObject(parameterType, request);
                             parameters[i] = paramObject;
-                           
                         }
                     }
 
