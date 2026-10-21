@@ -14,11 +14,14 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import mg.itu.rivaldo.annotation.Session;
+import mg.itu.rivaldo.annotation.MapSession;
 import mg.itu.rivaldo.util.BindingUtil;
+import mg.itu.rivaldo.util.SessionUtil;
+import mg.itu.rivaldo.annotation.MapSession;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
+
 
 
 @MultipartConfig(
@@ -67,8 +70,7 @@ public class FrontControllerServlet extends HttpServlet {
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
 
-                Session session = null;
-                HttpSession httpSession = null;
+                MapSession mapSession = null;
 
                 if (parameterTypes.length == 0) {
                     // Méthode sans paramètre
@@ -108,13 +110,11 @@ public class FrontControllerServlet extends HttpServlet {
 
                         } 
 
-                        else if (parameterType == Session.class) {
-                            httpSession = request.getSession();
-                            if (session == null) {
-                                session = new Session();
-                                session.loadFrom(httpSession);  
+                        else if (parameterType == MapSession.class) {
+                            if (mapSession == null) {
+                                mapSession = SessionUtil.fromHttpSession(request);
                             }
-                            parameters[i] = session;
+                            parameters[i] = mapSession;
                         }
                                                 
                         // Objet
@@ -126,8 +126,8 @@ public class FrontControllerServlet extends HttpServlet {
 
                     retour = mapping.getMethod().invoke(controllerInstance, parameters);
 
-                    if (session != null) {
-                        session.applyTo(httpSession); 
+                    if (mapSession != null) {
+                        SessionUtil.syncWithHttpSession(request, mapSession);
                     }
                 }
 
