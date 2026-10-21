@@ -1,4 +1,3 @@
-// FrontControllerServlet.java - version corrigée
 package mg.itu.rivaldo.controller;
 
 import jakarta.servlet.ServletException;
@@ -7,6 +6,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import mg.itu.rivaldo.annotation.RestApi;
 
 import java.io.IOException;
@@ -14,9 +14,14 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import mg.itu.rivaldo.annotation.MapSession;
+import mg.itu.rivaldo.util.BindingUtil;
+import mg.itu.rivaldo.util.SessionUtil;
+import mg.itu.rivaldo.annotation.MapSession;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
+
 
 
 @MultipartConfig(
@@ -65,6 +70,8 @@ public class FrontControllerServlet extends HttpServlet {
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
 
+                MapSession mapSession = null;
+
                 if (parameterTypes.length == 0) {
                     // Méthode sans paramètre
                     retour = mapping.getMethod().invoke(controllerInstance);
@@ -101,17 +108,27 @@ public class FrontControllerServlet extends HttpServlet {
                             String value = request.getParameter(parameterName);
                             parameters[i] = Double.parseDouble(value);
 
-                        }
+                        } 
 
-                        // parametre de type objet (classe)
-                        else{
+                        else if (parameterType == MapSession.class) {
+                            if (mapSession == null) {
+                                mapSession = SessionUtil.fromHttpSession(request);
+                            }
+                            parameters[i] = mapSession;
+                        }
+                                                
+                        // Objet
+                        else{ 
                             Object paramObject = BindingUtil.bindObject(parameterType, request);
                             parameters[i] = paramObject;
-                           
                         }
                     }
 
                     retour = mapping.getMethod().invoke(controllerInstance, parameters);
+
+                    if (mapSession != null) {
+                        SessionUtil.syncWithHttpSession(request, mapSession);
+                    }
                 }
 
                 if (mapping.getMethod().isAnnotationPresent(RestApi.class)) {
@@ -176,7 +193,6 @@ public class FrontControllerServlet extends HttpServlet {
         processRequest(req, res);
     }
 }
-
 
 
 

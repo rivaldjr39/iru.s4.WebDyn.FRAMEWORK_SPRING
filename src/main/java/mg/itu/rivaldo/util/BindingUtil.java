@@ -1,4 +1,4 @@
-package mg.itu.rivaldo.controller;
+package mg.itu.rivaldo.util;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -251,4 +251,3 @@ public class BindingUtil {
         System.out.println("Bytes sauvegardés dans : " + fichierBytes.getAbsolutePath());
     }
 }
-
