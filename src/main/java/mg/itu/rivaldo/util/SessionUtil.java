@@ -40,22 +40,6 @@ public final class SessionUtil {
         }
     }
 
-    public static boolean verifyMapSessionObject(HttpServletRequest request, Object[] parameters) {
-        if (parameters == null) {
-            return false;
-        }
-
-        for (Object parameter : parameters) {
-            if (parameter instanceof MapSession) {
-                if (getMapSessionContext(request) == null) {
-                    setMapSessionContext(request, (MapSession) parameter);
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /** Stocké au niveau de la requête (et non du ServletContext) pour ne pas mélanger les utilisateurs. */
     public static void setMapSessionContext(HttpServletRequest request, MapSession mapSession) {
