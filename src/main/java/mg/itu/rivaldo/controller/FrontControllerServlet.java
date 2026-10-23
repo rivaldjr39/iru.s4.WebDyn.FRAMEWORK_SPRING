@@ -79,9 +79,10 @@ public class FrontControllerServlet extends HttpServlet {
                     HttpSession session = request.getSession(false);
 
                     if (session == null || session.getAttribute(authSessionName) == null) {
-                        request.getSession(true).setAttribute("erreurAuth","Accès refusé : l'utilisateur n'est pas authentifié.");
-
-                        response.sendRedirect(request.getContextPath() + "/controller/login");
+                        response.setContentType("text/html;charset=UTF-8");
+                        response.getWriter().println(
+                            "<p style='color:red;'>Accès refusé : l'utilisateur n'est pas authentifié.</p>"
+                        );
                         return;
                     }
                 }
