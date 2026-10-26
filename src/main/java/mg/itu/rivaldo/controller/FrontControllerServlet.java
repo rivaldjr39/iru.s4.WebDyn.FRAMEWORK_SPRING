@@ -18,6 +18,8 @@ import mg.itu.rivaldo.annotation.MapSession;
 import mg.itu.rivaldo.util.BindingUtil;
 import mg.itu.rivaldo.util.SessionUtil;
 import mg.itu.rivaldo.annotation.MapSession;
+import mg.itu.rivaldo.annotation.Auth;
+import mg.itu.rivaldo.util.AuthUtil;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -37,6 +39,7 @@ public class FrontControllerServlet extends HttpServlet {
     private List<String> controllerClassNames;
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
     private ApplicationContext springContext;
+    private String authSessionName;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -48,6 +51,10 @@ public class FrontControllerServlet extends HttpServlet {
           prefixe = (String) context.getAttribute("prefixe");
           suffixe = (String) context.getAttribute("suffixe");
           springContext = (ApplicationContext) context.getAttribute("springContext");
+          authSessionName = getServletContext().getInitParameter("auth-session");
+          if(authSessionName == null || authSessionName.isBlank()) {
+              throw new ServletException("Le paramètre d'initialisation 'auth-session' est manquant ou vide dans le fichier web.xml");
+          }
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
@@ -66,6 +73,14 @@ public class FrontControllerServlet extends HttpServlet {
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
                 Object retour;
+
+                // Vérifier l'authentification avant l'exécution
+                if (mapping.getMethod().isAnnotationPresent(Auth.class)) {
+
+                    if(!AuthUtil.verifyAuth(request, response, authSessionName)) {
+                        return;
+                    }
+                }
                 
                 //verification si la méthode a des paramètres
                 Class<?>[] parameterTypes = mapping.getMethod().getParameterTypes();
