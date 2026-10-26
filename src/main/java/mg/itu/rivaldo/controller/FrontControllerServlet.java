@@ -19,6 +19,7 @@ import mg.itu.rivaldo.util.BindingUtil;
 import mg.itu.rivaldo.util.SessionUtil;
 import mg.itu.rivaldo.annotation.MapSession;
 import mg.itu.rivaldo.annotation.Auth;
+import mg.itu.rivaldo.util.AuthUtil;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -76,13 +77,7 @@ public class FrontControllerServlet extends HttpServlet {
                 // Vérifier l'authentification avant l'exécution
                 if (mapping.getMethod().isAnnotationPresent(Auth.class)) {
 
-                    HttpSession session = request.getSession(false);
-
-                    if (session == null || session.getAttribute(authSessionName) == null) {
-                        response.setContentType("text/html;charset=UTF-8");
-                        response.getWriter().println(
-                            "<p style='color:red;'>Accès refusé : l'utilisateur n'est pas authentifié.</p>"
-                        );
+                    if(!AuthUtil.verifyAuth(request, response, authSessionName)) {
                         return;
                     }
                 }
