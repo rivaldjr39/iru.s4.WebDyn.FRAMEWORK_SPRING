@@ -40,6 +40,7 @@ public class FrontControllerServlet extends HttpServlet {
     private Map<UrlType, Mapping> mappingUrls = new HashMap<>();
     private ApplicationContext springContext;
     private String authSessionName;
+    private String rolesSessionName;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -51,10 +52,17 @@ public class FrontControllerServlet extends HttpServlet {
           prefixe = (String) context.getAttribute("prefixe");
           suffixe = (String) context.getAttribute("suffixe");
           springContext = (ApplicationContext) context.getAttribute("springContext");
+
           authSessionName = getServletContext().getInitParameter("auth-session");
           if(authSessionName == null || authSessionName.isBlank()) {
               throw new ServletException("Le paramètre d'initialisation 'auth-session' est manquant ou vide dans le fichier web.xml");
           }
+
+          rolesSessionName = getServletContext().getInitParameter("roles-session");
+          if(rolesSessionName == null || rolesSessionName.isBlank()) {
+              throw new ServletException("Le paramètre d'initialisation 'roles-session' est manquant ou vide dans le fichier web.xml");
+          }
+
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
@@ -73,11 +81,17 @@ public class FrontControllerServlet extends HttpServlet {
             if (mapping != null) {
                 Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
                 Object retour;
-
-                // Vérifier l'authentification avant l'exécution
+            
+                // Vérifier l'authentification et role avant l'exécution
                 if (mapping.getMethod().isAnnotationPresent(Auth.class)) {
 
+                    Auth auth = mapping.getMethod().getAnnotation(Auth.class);
+
                     if(!AuthUtil.verifyAuth(request, response, authSessionName)) {
+                        return;
+                    }
+
+                    if(!AuthUtil.verifyRole(request, response, rolesSessionName, auth)) {
                         return;
                     }
                 }
