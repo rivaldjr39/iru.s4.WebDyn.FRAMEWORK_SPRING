@@ -20,6 +20,7 @@ import mg.itu.rivaldo.util.SessionUtil;
 import mg.itu.rivaldo.annotation.MapSession;
 import mg.itu.rivaldo.annotation.Auth;
 import mg.itu.rivaldo.util.AuthUtil;
+import mg.itu.rivaldo.util.SingletonUtil;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -79,7 +80,7 @@ public class FrontControllerServlet extends HttpServlet {
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
 
             if (mapping != null) {
-                Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
+                Object controllerInstance = SingletonUtil.getInstance(getServletContext(), mapping.getControllerClass());
                 Object retour;
             
                 // Vérifier l'authentification et role avant l'exécution

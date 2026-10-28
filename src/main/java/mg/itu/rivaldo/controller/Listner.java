@@ -20,6 +20,7 @@ import mg.itu.rivaldo.util.Util;
 
 @WebListener
 public class Listner implements ServletContextListener {
+    
     public void contextInitialized(ServletContextEvent sce) {
         try {
             ServletContext context = sce.getServletContext();
