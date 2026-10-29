@@ -16,6 +16,7 @@ import java.util.Map;
 
 import mg.itu.rivaldo.annotation.Url;
 import mg.itu.rivaldo.util.Util;
+import mg.itu.rivaldo.util.MessageUtil;
 
 
 @WebListener
@@ -28,21 +29,21 @@ public class Listner implements ServletContextListener {
             String packageName = context.getInitParameter("packageNames");
             String prefixe = context.getInitParameter("prefixe");
             String suffixe = context.getInitParameter("suffixe");
+
+            String lang = context.getInitParameter("lang");
+            MessageUtil.setLang(lang);
+
+
             Util util = new Util();
             Map<UrlType, Mapping> mappingUrls = new HashMap<>();
-            List<String> controllerClassNames =
-                    util.getListClassNamesWithAnnotation(
-                            context,
-                            packageName,
-                            Url.class,
-                            mappingUrls
-                    );
+            List<String> controllerClassNames = util.getListClassNamesWithAnnotation(context,packageName,Url.class,mappingUrls);
 
             context.setAttribute("mappingUrls", mappingUrls);
             context.setAttribute("controllerClassNames", controllerClassNames);
             context.setAttribute("prefixe", prefixe);
             context.setAttribute("suffixe", suffixe);
             context.setAttribute("springContext", springContext);
+            context.setAttribute("lang", lang);
 
             System.out.println("Framework initialisé.");
 

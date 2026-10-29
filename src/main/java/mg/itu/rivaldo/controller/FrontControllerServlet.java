@@ -42,6 +42,7 @@ public class FrontControllerServlet extends HttpServlet {
     private ApplicationContext springContext;
     private String authSessionName;
     private String rolesSessionName;
+    private String lang;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -62,6 +63,11 @@ public class FrontControllerServlet extends HttpServlet {
           rolesSessionName = getServletContext().getInitParameter("roles-session");
           if(rolesSessionName == null || rolesSessionName.isBlank()) {
               throw new ServletException("Le paramètre d'initialisation 'roles-session' est manquant ou vide dans le fichier web.xml");
+          }
+
+          lang = (String) context.getAttribute("lang");
+          if(lang == null || lang.isBlank()) {
+              throw new ServletException("Le paramètre d'initialisation 'lang' est manquant ou vide dans le fichier web.xml");
           }
 
         } catch (Exception e) {
