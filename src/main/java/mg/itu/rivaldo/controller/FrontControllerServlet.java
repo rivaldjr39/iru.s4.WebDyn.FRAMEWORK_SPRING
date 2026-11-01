@@ -20,6 +20,7 @@ import mg.itu.rivaldo.util.SessionUtil;
 import mg.itu.rivaldo.annotation.MapSession;
 import mg.itu.rivaldo.annotation.Auth;
 import mg.itu.rivaldo.util.AuthUtil;
+import mg.itu.rivaldo.util.SingletonUtil;
 import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -41,6 +42,7 @@ public class FrontControllerServlet extends HttpServlet {
     private ApplicationContext springContext;
     private String authSessionName;
     private String rolesSessionName;
+    private String lang;
 
     @Override   
     @SuppressWarnings("unchecked") 
@@ -63,6 +65,11 @@ public class FrontControllerServlet extends HttpServlet {
               throw new ServletException("Le paramètre d'initialisation 'roles-session' est manquant ou vide dans le fichier web.xml");
           }
 
+          lang = (String) context.getAttribute("lang");
+          if(lang == null || lang.isBlank()) {
+              throw new ServletException("Le paramètre d'initialisation 'lang' est manquant ou vide dans le fichier web.xml");
+          }
+
         } catch (Exception e) {
             throw new ServletException("Erreur initialisation", e);
         }
@@ -79,7 +86,7 @@ public class FrontControllerServlet extends HttpServlet {
             Mapping mapping = mappingUrls.get(new UrlType("/" + path, request.getMethod()));
 
             if (mapping != null) {
-                Object controllerInstance = mapping.getControllerClass().getDeclaredConstructor().newInstance();
+                Object controllerInstance = SingletonUtil.getInstance(getServletContext(), mapping.getControllerClass());
                 Object retour;
             
                 // Vérifier l'authentification et role avant l'exécution

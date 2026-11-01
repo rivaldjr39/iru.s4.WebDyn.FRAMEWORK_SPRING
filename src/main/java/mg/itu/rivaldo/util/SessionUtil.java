@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 import mg.itu.rivaldo.annotation.MapSession;
 
+
 public final class SessionUtil {
     private static final String MAPSESSION_KEY = "mapsession";
 

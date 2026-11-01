@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
+import mg.itu.rivaldo.util.MessageUtil;
 
 public class AuthUtil {
     
@@ -17,7 +18,7 @@ public class AuthUtil {
 
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println(
-                "<p style='color:red;'>Accès refusé : l'utilisateur n'est pas authentifié.</p>"
+                "<p style='color:red;'>" + MessageUtil.get("auth.required") + "</p>"
             );
 
             return false;
@@ -51,7 +52,7 @@ public class AuthUtil {
 
         response.setContentType("text/html;charset=UTF-8");
         response.getWriter().println(
-            "<p style='color:red;'>Accès refusé : l'utilisateur n'a pas le rôle requis.</p>"
+            "<p style='color:red;'>" + MessageUtil.get("access.denied") + "</p>"
         );
 
         return false;
