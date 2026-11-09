@@ -32,7 +32,7 @@ public class SingletonUtil {
                 if (instance == null) {
                     instance = clazz.getDeclaredConstructor().newInstance();
                     instances.put(clazz, instance);
-                    //System.out.println("Nouvelle instance créée pour la classe : " + clazz.getName());
+                    System.out.println("Instance creer : " + clazz.getName());
                 }
             }
         }
